@@ -8,19 +8,19 @@
 
 
 
- - Game Screenshots
+ - Game Screenshots:
  
  
-      Third Person Camera:
+      Third Person Camera
    
     ![Third Person Camera](https://i.imgur.com/lqMm3LG.png)
    
    
-      First Person Camera:
+      First Person Camera
    
     ![First Person Camera](https://i.imgur.com/a4HYnOB.png)
    
    
-      Running out of fuel:
+      Running out of fuel
    
     ![Game Over](https://i.imgur.com/fCeqqJa.png)

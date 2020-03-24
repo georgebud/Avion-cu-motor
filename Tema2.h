@@ -58,7 +58,7 @@ protected:
 	//airplane
 	float rot_elice = 0;
 	float rot_plane = 0;
-	float speed_elice = 30;
+	float speed_elice = 17;
 	float speed_plane = 33;
 	float planeX = -0.8, planeY = 1.2, planeZ = 0, translateY = 0;
 	float constY = 1;
@@ -71,8 +71,8 @@ protected:
 
 	//stars & energy bar
 	std::vector<Mesh*> stars;
-	float starX = -0.65;
-	float barSpeed = 0.03;
+	float starX = -0.95;
+	float barSpeed = 0.05; //0.05
 	float energyX = 0.7;
 	float energy = 1;
 	float energyLost = 0.3;
@@ -83,11 +83,11 @@ protected:
 	float cloudX, cloudY, cloudZ;
 	bool cloudMove = false;
 	float cloudLimit = -15;
-	int cloudNmb = 25;
+	int cloudNmb = 20; //12
 
 	//obstacles
 	std::vector<Triplet> obstaclePos;
-	float obstaclesNmb = 9;
+	float obstaclesNmb = 9; //7
 	float obstacleX;
 	float obstacleLimit = -8;
 	bool obstacleMove = false;
@@ -104,7 +104,7 @@ protected:
 	//sea
 	float rot_sea = 0;
 	float seaY = 0;
-	float sea_level = -11;
+	float sea_level = -14;
 	bool sea_misc = false;
 
 	bool GameOver = false;

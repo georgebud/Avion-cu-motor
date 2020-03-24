@@ -1,5 +1,6 @@
 #include "Tema2.h"
 #include "Transform3D.h"
+#include "Transform2D.h"
 #include "Obj2D.h"
 
 #include <vector>
@@ -94,17 +95,17 @@ void Tema2::Init()
 
 			if (num == 0) {
 				mesh = new Mesh("cloud1");
-				mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "nor1.obj");
+				mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "cloud1.obj");
 				meshes[mesh->GetMeshID()] = mesh;
 				clouds.push_back(mesh);
 			}
 			else if (num == 1) {
 				mesh = new Mesh("cloud2");
-				mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "nor2.obj");
+				mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "cloud2.obj");
 				meshes[mesh->GetMeshID()] = mesh;
 				clouds.push_back(mesh);
 			}
-			positionCloud.push_back({RandomNb(-5, 12), RandomNb(0, 4.2), RandomNb(-7, 2)});
+			positionCloud.push_back({RandomNb(-5, 15), RandomNb(0, 4.2), RandomNb(-10, 3)});
 		}
 		std::sort(positionCloud.begin(), positionCloud.end(), triplet);
 
@@ -117,9 +118,9 @@ void Tema2::Init()
 	{
 		for (int i = 0; i < obstaclesNmb; ++i) {
 			Mesh* mesh = new Mesh("asteroid");
-			mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "asteroyd.obj");
+			mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "asteroid.obj");
 			meshes[mesh->GetMeshID()] = mesh;
-			obstaclePos.push_back({RandomNb(5 + i, 20), RandomNb(0.5, 3), RandomNb(-0.2, 0.2) });
+			obstaclePos.push_back({RandomNb(5 + i, 20), RandomNb(0.5, 3), RandomNb(-0.10, 0.10) });
 		}
 		std::sort(obstaclePos.begin(), obstaclePos.end(), triplet);
 
@@ -133,15 +134,15 @@ void Tema2::Init()
 		float y = RandomNb(0.5, 2.2);
 
 		for (int i = 0; i < fuelBlocks; ++i) {
-			Mesh* mesh = new Mesh("diamond");
-			mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "diamond.obj");
+			Mesh* mesh = new Mesh("diamond2");
+			mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "diamond2.obj");
 			meshes[mesh->GetMeshID()] = mesh;	
-			x += 0.18;
-			fuelPos.push_back({ x , y, 0 });
-			if (i < 4)
-				y -= 0.07;
+			x += 0.15;
+			fuelPos.push_back({x , y, 0});
+			if (i < 3)
+				y -= 0.04;
 			else
-				y += 0.09;
+				y += 0.06;
 		}
 
 		fuelX = 0;
@@ -153,19 +154,20 @@ void Tema2::Init()
 		for (int i = 0; i < 3; ++i) {
 			Mesh* mesh = new Mesh("star");
 			mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "star.obj");
+			//meshes[mesh->GetMeshID()] = mesh;
 			stars.push_back(mesh);
 		}
 	}
 
 	//init energy bar
 	{
-		Mesh* borderBar = Obj2D::CreateRectangle("borderBar", 0.22, 0.1);
+		Mesh* borderBar = Obj2D::CreateRectangle("borderBar", 0.28, 0.08);
 		AddMeshToList(borderBar);
 		
-		Mesh* Bar = Obj2D::CreateRectangle("Bar", 0.21, 0.08);
+		Mesh* Bar = Obj2D::CreateRectangle("Bar", 0.27, 0.06);
 		AddMeshToList(Bar);
 		
-		Mesh* energyBar = Obj2D::CreateRectangle("energyBar", 0.21, 0.08);
+		Mesh* energyBar = Obj2D::CreateRectangle("energyBar", 0.27, 0.06);
 		AddMeshToList(energyBar);
 	}
 
@@ -173,6 +175,14 @@ void Tema2::Init()
 	{
 		Mesh* mesh = new Mesh("sea");
 		mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere2.obj");
+		meshes[mesh->GetMeshID()] = mesh;
+	}
+
+
+	// init sphere
+	{
+		Mesh* mesh = new Mesh("sphere");
+		mesh->LoadMesh(RESOURCE_PATH::MODELS + "Primitives", "sphere.obj");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
 
@@ -191,7 +201,7 @@ void Tema2::Init()
 		shaders[shader->GetName()] = shader;
 		
 		shader = new Shader("SeaShader");
-		shader->AddShader("Source/Laboratoare/Tema2/Shaders/SeaVertexShader.glsl", GL_VERTEX_SHADER);
+		shader->AddShader("Source/Laboratoare/Tema2/Shaders/SeaVertexShader2.glsl", GL_VERTEX_SHADER);
 		shader->AddShader("Source/Laboratoare/Tema2/Shaders/FragmentShader.glsl", GL_FRAGMENT_SHADER);
 		shader->CreateAndLink();
 		shaders[shader->GetName()] = shader;
@@ -200,7 +210,7 @@ void Tema2::Init()
 	//Light & material properties
 	{
 		lightPosition = glm::vec3(0, 1, 1);
-		materialShininess = 80;
+		materialShininess = 30;
 		materialKd = 0.5;
 		materialKs = 0.5;
 	}
@@ -210,7 +220,7 @@ void Tema2::Init()
 void Tema2::FrameStart()
 {
 	// clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(0.7647, 0.5019, 1, 1);
+	glClearColor(0.9490, 0.7686, 1, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::ivec2 resolution = window->GetResolution();
@@ -234,9 +244,9 @@ void Tema2::Update(float deltaTimeSeconds)
 				positionCloud[i].third = positionCloud[i + 1].third;
 				clouds[i] = clouds[i + 1];
 			}
-			positionCloud[cloudNmb - 1].first = positionCloud[cloudNmb - 2].first + RandomNb(0, 4);
-			positionCloud[cloudNmb - 1].second = RandomNb(0, 4.2);
-			positionCloud[cloudNmb - 1].third = RandomNb(-7, 1);
+			positionCloud[cloudNmb - 1].first = positionCloud[cloudNmb - 2].first + RandomNb(0, 5);
+			positionCloud[cloudNmb - 1].second = RandomNb(-0.5, 4.2);
+			positionCloud[cloudNmb - 1].third = RandomNb(-10, 3);
 			
 			Mesh* mesh;
 			if (Random01() == 0) {
@@ -251,7 +261,7 @@ void Tema2::Update(float deltaTimeSeconds)
 			//cloudX -= 0.005 * deltaTimeSeconds;
 			cloudX = -2 * deltaTimeSeconds;
 			cloudY = 0.08 * deltaTimeSeconds;
-			cloudZ = 0.15 * deltaTimeSeconds;
+			cloudZ = 0.09 * deltaTimeSeconds;
 
 			for (int i = 0; i < cloudNmb; ++i) {
 				positionCloud[i].first += cloudX;
@@ -264,7 +274,7 @@ void Tema2::Update(float deltaTimeSeconds)
 					positionCloud[i].second -= cloudY;
 				}
 
-				positionCloud[i].third += cloudZ;
+				positionCloud[i].third -= cloudZ;
 
 				glm::mat4 modelMatrix = glm::mat4(1);
 				modelMatrix = Transform3D::Translate(positionCloud[i].first, positionCloud[i].second, positionCloud[i].third);
@@ -297,13 +307,13 @@ void Tema2::Update(float deltaTimeSeconds)
 			for (int i = 0; i < obstaclesNmb; ++i) {
 
 				obstaclePos[i].first += obstacleX;
-				rot_obs -= 0.5 * deltaTimeSeconds;
+				rot_obs -= 0.3 * deltaTimeSeconds;
 
 				glm::mat4 modelMatrix = glm::mat4(1);
 				modelMatrix = Transform3D::Translate(obstaclePos[i].first, obstaclePos[i].second, obstaclePos[i].third);
 				modelMatrix *= Transform3D::RotateOX(rot_obs);
 				modelMatrix = glm::scale(modelMatrix, glm::vec3(0.15));
-				RenderMesh(meshes["asteroid"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.3, 0.3, 0.3));
+				RenderMesh(meshes["asteroid"], shaders["ShaderTema2"], modelMatrix, glm::vec3(1, 0.2, 0.2));
 
 
 				if (SphereCollision(planeX + 0.22, planeY + translateY, planeZ, 0.20, obstaclePos[i].first, obstaclePos[i].second, obstaclePos[i].third, 0.08) && !GameOver) {
@@ -339,10 +349,9 @@ void Tema2::Update(float deltaTimeSeconds)
 				if (planeY + translateY > 0) {
 					translateY -= 0.7 * deltaTimeSeconds;
 				}
-				else if (planeY + translateY > -5) {
-					translateY -= 5 * deltaTimeSeconds;
-					if (energy > 0) barSpeed += 0.1;
-				}
+				else translateY -= 5 * deltaTimeSeconds;
+
+				if (translateY < -5) system("pause");
 			}
 		}
 	}
@@ -360,17 +369,20 @@ void Tema2::Update(float deltaTimeSeconds)
 			float y = RandomNb(0.5, 2.5);
 
 			for (int i = 0; i < fuelBlocks; ++i) {
-				x += 0.18;
-				fuelPos.push_back({ x , y, RandomNb(-0.10, 0.10) });
-				if (i < 4)
-					y -= 0.07;
-				else
-					y += 0.09;
+				x += 0.15;
+				fuelPos.push_back({ x, y, 0 });
+				if (i < 3) {
+					y -= 0.04;
+				}
+				else 
+				{
+					y += 0.06;
+				}
 			}
 		}
 
 		if (fuelMove) {
-			fuelX = -2 * deltaTimeSeconds;
+			fuelX = -2.2 * deltaTimeSeconds;
 			rot_fuel += 2.5 * deltaTimeSeconds;
 
 			for (int i = 0; i < fuelPos.size(); ++i) {
@@ -380,10 +392,12 @@ void Tema2::Update(float deltaTimeSeconds)
 				modelMatrix = Transform3D::Translate(fuelPos[i].first, fuelPos[i].second, fuelPos[i].third);
 				modelMatrix = glm::scale(modelMatrix, glm::vec3(0.8));
 				modelMatrix *= Transform3D::RotateOX(rot_fuel + i);
-				RenderMesh(meshes["diamond"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.611, 0.968, 0.250));
+				RenderMesh(meshes["diamond2"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.2352, 0.9098, 0.5607));
 			
 				if (SphereCollision(planeX + 0.22, planeY + translateY, planeZ, 0.20, fuelPos[i].first, fuelPos[i].second, fuelPos[i].third, 0.02) && !GameOver) {
-					energy += 0.07;
+					/*++counter;
+					cout << "intersection " << counter << "\n";*/
+					energy += 0.05;
 					if (energy > 1)
 						energy = 1;
 
@@ -395,6 +409,7 @@ void Tema2::Update(float deltaTimeSeconds)
 					//resize -1
 					if (fuelPos.size() > 0)
 						fuelPos.resize(fuelPos.size() - 1);
+
 				}
 			}
 		}
@@ -416,24 +431,33 @@ void Tema2::Update(float deltaTimeSeconds)
 
 		modelMatrix = glm::rotate(modelMatrix, RADIANS(rot_plane), glm::vec3(0, 0, 1));
 
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.7));
-		RenderMesh(meshes["airplane_body"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.8823, 0.8980, 0.2));
-		RenderMesh(meshes["airplane_head"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.23, 0.24, 0.1));
+		RenderMesh(meshes["airplane_body"], shaders["VertexNormal"], modelMatrix, glm::vec3(0.8823, 0.8980, 0.2));
+		RenderMesh(meshes["airplane_head"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.598, 0.9019, 0.447));
 
 		rot_elice += -speed_elice * deltaTimeSeconds;
 		modelMatrix *= Transform3D::RotateOX(rot_elice);
-		RenderMesh(meshes["airplane_elice"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.8, 0.8, 0.8));
+		RenderMesh(meshes["airplane_elice"], shaders["ShaderTema2"], modelMatrix, glm::vec3(0.42, 0.82, 0.12));
 	}
+
 
 	//sea rendering
 	{
-		rot_sea -= -8 * deltaTimeSeconds;
+		rot_sea -= -10 * deltaTimeSeconds;
+
+		if (seaY >= 0)
+			sea_misc = true;
+		if (seaY < -1.5)
+			sea_misc = false;
+
+		if (sea_misc)
+			seaY -= 0.1 * deltaTimeSeconds;
+		else seaY += 0.3 * deltaTimeSeconds;
 
 		glm::mat4 modelMatrix = glm::mat4(1);
-		modelMatrix = Transform3D::Translate(0, sea_level, 0);
-		modelMatrix = glm::scale(modelMatrix, glm::vec3(5));
+		modelMatrix = Transform3D::Translate(0, sea_level + seaY, 0);
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(6.5));
 		modelMatrix = glm::rotate(modelMatrix, RADIANS(5 + rot_sea), glm::vec3(0, 0, 1));
-		RenderMesh(meshes["sea"], shaders["SeaShader"], modelMatrix, glm::vec3(0.264, 0.564, 0.849));
+		RenderMesh(meshes["sea"], shaders["SeaShader"], modelMatrix, glm::vec3(0.3921, 0.7058, 0.8901));
 
 	}
 
@@ -441,12 +465,11 @@ void Tema2::Update(float deltaTimeSeconds)
 	{
 		for (int i = 0; i < stars.size(); ++i) {
 			glm::mat4 modelMatrix = glm::mat4(1);	
-			modelMatrix = glm::scale(modelMatrix, glm::vec3(1.4));
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(starX, 0.6, 0));
-			RenderMesh(stars[0], shaders["2DShader"], modelMatrix, glm::vec3(1, 0.33, 0));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(starX, 0.9, 0));
+			RenderMesh(stars[0], shaders["2DShader"], modelMatrix, glm::vec3(1, 0, 0));
 			starX += 0.05;
 		}
-		starX = -0.65;
+		starX = -0.95;
 	}
 
 	//energy bar rendering
@@ -469,22 +492,52 @@ void Tema2::Update(float deltaTimeSeconds)
 				if (planeY + translateY > 0) {
 					translateY -= 0.7 * deltaTimeSeconds;
 				}
-				else if (planeY + translateY > -5) translateY -= 5 * deltaTimeSeconds;
+				else translateY -= 5 * deltaTimeSeconds;
+
+				if (translateY < -5) {
+					system("pause");
+				}
+				
+				// daca se termina combustibilul atunci se pierde o viata si se reincarca bara de combustibil si va scadea mai rapid
+				/*if (stars.size() > 1) {
+					barSpeed += 0.1;
+					energy = 1 - energyLost;
+					energyLost += 0.2;
+					stars.resize(stars.size() - 1);
+				}
+				else if (stars.size() == 1) {
+					stars.resize(stars.size() - 1);
+					cloudX = -0.5 * deltaTimeSeconds;
+					GameOver = true;
+					printf("\n----Fuel finised----\n\t<GAME OVER!>\n");
+
+					if (rot_plane > -35) {
+						rot_plane -= speed_plane * 2 * deltaTimeSeconds;
+					}
+					if (planeY + translateY > 0) {
+						translateY -= 0.7 * deltaTimeSeconds;
+					}
+					else translateY -= 5 * deltaTimeSeconds;
+
+					if (translateY < -5) {
+						system("pause");
+					}
+				}*/
 			}
 
 			glm::mat4 modelMatrix = glm::mat4(1);
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX, 0.85, 0));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX, 0.9, 0));
 			modelMatrix = glm::scale(modelMatrix, glm::vec3(energy, 1, 0));
-			RenderMesh(meshes["energyBar"], shaders["2DShader"], modelMatrix, glm::vec3(0.07, 0.6, 0.05)); //energy bar
+			RenderMesh(meshes["energyBar"], shaders["2DShader"], modelMatrix, glm::vec3(0.6177, 0.2044, 0.7022)); //energy bar
 		}
 		{
 			glm::mat4 modelMatrix = glm::mat4(1);
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX, 0.85, 0));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX, 0.9, 0));
 			RenderMesh(meshes["Bar"], shaders["2DShader"], modelMatrix, glm::vec3(1, 1, 1)); //white bar
 		}
 		{
 			glm::mat4 modelMatrix = glm::mat4(1);
-			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX - 0.005, 0.84, 0));
+			modelMatrix = glm::translate(modelMatrix, glm::vec3(energyX - 0.005, 0.89, 0));
 			RenderMesh(meshes["borderBar"], shaders["2DShader"], modelMatrix, glm::vec3(0, 0, 0)); //black bar
 		}
 	}
@@ -496,6 +549,18 @@ void Tema2::Update(float deltaTimeSeconds)
 			camera->RotateFirstPerson_OX(0.08);
 			camera->RotateFirstPerson_OX(rot_plane * 0.02 * 0.2);
 		}
+
+	}
+
+
+	// Render the camera target. Useful for understanding where is the rotation point in Third-person camera movement
+	if (renderCameraTarget)
+	{
+		glm::mat4 modelMatrix = glm::mat4(1);
+		modelMatrix = glm::translate(modelMatrix, camera->GetTargetPosition());
+		//modelMatrix = glm::translate(modelMatrix, glm::vec3(planeX, planeY, planeZ));
+		modelMatrix = glm::scale(modelMatrix, glm::vec3(0.05f));
+		RenderMesh(meshes["sphere"], shaders["VertexNormal"], modelMatrix);
 	}
 
 }
@@ -591,12 +656,17 @@ void Tema2::OnInputUpdate(float deltaTime, int mods)
 			camera->TranslateUpward(deltaTime * cameraSpeed);
 		}
 	}
+
 	
 }
 
 void Tema2::OnKeyPress(int key, int mods)
 {
 	// add key press event
+	/*if (key == GLFW_KEY_T)
+	{
+		renderCameraTarget = !renderCameraTarget;
+	}*/
 
 	if (window->KeyHold(GLFW_KEY_C)) {
 		flagC = !flagC;
@@ -638,7 +708,6 @@ void Tema2::OnMouseMove(int mouseX, int mouseY, int deltaX, int deltaY)
 		}
 
 	}
-
 	if (!GameOver) {
 		if (onGoing) {
 			currY = mouseY;

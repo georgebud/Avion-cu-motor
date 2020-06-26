@@ -1,4 +1,4 @@
-# Flappy Bird
+# Avion cu motor
  2nd homework in the Computer Graphics course
 
  - The aim of the project was to stimulate creativity by implementing a map to fly a plane.
